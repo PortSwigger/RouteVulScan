@@ -1,0 +1,13 @@
+Uuid: a7d0105d20b8445689908ff8cedfd246
+ExtensionType: 1
+Name: RouteVulScan
+RepoName: route-vul-scan
+ScreenVersion: 1.2
+SerialVersion: 2
+MinPlatformVersion: 0
+ProOnly: True
+Author: F6JO
+ShortDescription: This plug-in can recursively detect vulnerable paths. You can customize related paths, matching information and vulnerability names.
+EntryPoint: build/libs/route-vul-scan-1.0-SNAPSHOT.jar
+BuildCommand: ./gradlew fatJar
+SupportedProducts: Pro

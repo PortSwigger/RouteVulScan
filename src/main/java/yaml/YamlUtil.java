@@ -4,9 +4,6 @@ import burp.BurpExtender;
 import burp.IHttpRequestResponse;
 import burp.IRequestInfo;
 import burp.View;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import func.init_Yaml_thread;
 import org.yaml.snakeyaml.Yaml;
 
