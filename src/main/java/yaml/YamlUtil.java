@@ -1,9 +1,6 @@
 package yaml;
 
 import burp.BurpExtender;
-import burp.IHttpRequestResponse;
-import burp.IRequestInfo;
-import burp.View;
 import func.init_Yaml_thread;
 import org.yaml.snakeyaml.Yaml;
 
@@ -52,6 +49,7 @@ public class YamlUtil {
         }
         Map<String, Object> save = (Map<String, Object>) new HashMap<String, Object>();
         save.put("Load_List", List2);
+        save.put("Bypass_List", Yaml_Map.get("Bypass_List"));
         YamlUtil.writeYaml(save, filePath);
     }
 
@@ -68,6 +66,7 @@ public class YamlUtil {
         }
         Map<String, Object> save = (Map<String, Object>) new HashMap<String, Object>();
         save.put("Load_List", List2);
+        save.put("Bypass_List", Yaml_Map.get("Bypass_List"));
         YamlUtil.writeYaml(save, filePath);
 
     }
@@ -85,10 +84,82 @@ public class YamlUtil {
             Map<String, Object> save = (Map<String, Object>) new HashMap<String, Object>();
             List1.add(add);
             save.put("Load_List", List1);
+            save.put("Bypass_List", Yaml_Map.get("Bypass_List"));
             YamlUtil.writeYaml(save, filePath);
         }
 
     }
+
+    public static Map<String, Object> readStrYaml(String str){
+        Map<String, Object> data = null;
+        Yaml yaml = new Yaml();
+        data = yaml.load(str);
+        return data;
+    }
+
+
+    public static void MergerUpdateYamlFunc(Map<String, Object> newYaml){
+        Map<String, Object> oldYaml = YamlUtil.readYaml(BurpExtender.Yaml_Path);
+        List<Map<String, Object>> oldYamlList = (List<Map<String, Object>>)oldYaml.get("Load_List");
+        List<Map<String, Object>> newYamlList = (List<Map<String, Object>>)newYaml.get("Load_List");
+        for (Map<String, Object> i : newYamlList){
+            if (!YamlUtil.inYamlList(oldYamlList,i)){
+                int id = 0;
+                for (Map<String, Object> zidian : (List<Map<String, Object>>)YamlUtil.readYaml(BurpExtender.Yaml_Path).get("Load_List")) {
+                    if ((int) zidian.get("id") > id) {
+                        id = (int) zidian.get("id");
+                    }
+                }
+                id += 1;
+                i.remove("id");
+                i.put("id",id);
+                YamlUtil.addYaml(i,BurpExtender.Yaml_Path);
+            }
+        }
+        List<String> oldBypassList = (List<String>)oldYaml.get("Bypass_List");
+        List<String> newBypassList = (List<String>)newYaml.get("Bypass_List");
+        if (oldBypassList == null){
+            oldBypassList = newBypassList;
+        }else {
+            for (String i : newBypassList){
+                if (!oldBypassList.contains(i)){
+                    oldBypassList.add(i);
+                }
+            }
+        }
+
+        Map<String, Object> save = (Map<String, Object>) new HashMap<String, Object>();
+        save.put("Load_List", (List<Map<String, Object>>) YamlUtil.readYaml(BurpExtender.Yaml_Path).get("Load_List"));
+        save.put("Bypass_List", oldBypassList);
+        YamlUtil.writeYaml(save,BurpExtender.Yaml_Path);
+
+
+
+    }
+
+    public static boolean inYamlList(List<Map<String, Object>> mapList,Map<String, Object> oneMap){
+        for (Map<String, Object> i : mapList){
+            if (YamlUtil.ifmapEqual(i,oneMap)){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public static boolean ifmapEqual(Map<String, Object> i, Map<String, Object> oneMap){
+        boolean mapEqual = true;
+        for (String key : i.keySet()){
+            if (!key.equals("loaded") && !key.equals("id") && !key.equals("type")){
+                if (!i.get(key).equals(oneMap.get(key))){
+                    mapEqual = false;
+                    break;
+                }
+            }
+        }
+        return mapEqual;
+    }
+
 
 
 }
